@@ -47,6 +47,7 @@ browser_data/
 
 # Claude Code 相关
 .claude/
+CLAUDE.md
 
 # 用户提示词和笔记（内部文件）
 user_prompts/
