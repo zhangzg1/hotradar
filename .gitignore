@@ -1,0 +1,83 @@
+# 音频暂存目录
+.video/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+*.egg-info/
+.eggs/
+*.egg
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Env (敏感信息，不上传)
+.env
+.env.local
+.env.*.local
+
+# Whisper models
+models/whisper/
+
+# 抖音 Cookie 文件（敏感凭据，已迁移至数据库）
+douyin_cookie.json
+
+# Playwright 持久化浏览器数据
+browser_data/
+
+# Claude Code 相关
+.claude/
+
+# 用户提示词和笔记（内部文件）
+user_prompts/
+
+# 项目设计文档（内部文件）
+project_design/
+
+# 测试文件（可选）
+test.py
+
+# Claude skills lock
+skills-lock.json
+
+# 测试相关
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 临时文件
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# 数据库数据（本地开发）
+mysql_data/
+redis_data/
+
+# 构建产物
+build/
+*.pyc
+
+# Docker 相关（本地数据卷）
+docker/mysql/data/
