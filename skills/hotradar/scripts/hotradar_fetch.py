@@ -3,7 +3,6 @@
 HotRadar - 独立热点数据采集脚本
 
 从多个数据源并行采集热点信息，进行去重和质量过滤，输出 JSON 结果。
-不依赖项目的 backend/llm 模块，可独立运行。
 
 用法:
     python hotradar_fetch.py <config.json> <output.json>

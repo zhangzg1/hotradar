@@ -2,8 +2,7 @@
 """
 HotRadar - 邮件推送脚本
 
-通过 Cloudflare Workers + Resend API 将热点分析结果发送到用户邮箱。
-SMTP 凭证存储在 Workers 密钥中，代码内不包含任何敏感信息。
+通过 Vercel + nodemailer 将热点分析结果发送到用户邮箱。
 
 用法:
     python hotradar_email.py <email_config.json>
