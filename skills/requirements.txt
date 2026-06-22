@@ -2,4 +2,3 @@ aiohttp>=3.9
 beautifulsoup4>=4.12
 lxml>=5.0
 tenacity>=8.2
-aiosmtplib>=3.0

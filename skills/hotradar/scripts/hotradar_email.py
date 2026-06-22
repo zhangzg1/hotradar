@@ -2,8 +2,8 @@
 """
 HotRadar - 邮件推送脚本
 
-将热点分析结果通过 SMTP 邮件发送给用户。
-SMTP 配置已内置，用户只需提供收件邮箱。
+通过 Cloudflare Workers + Resend API 将热点分析结果发送到用户邮箱。
+SMTP 凭证存储在 Workers 密钥中，代码内不包含任何敏感信息。
 
 用法:
     python hotradar_email.py <email_config.json>
@@ -29,20 +29,15 @@ import asyncio
 import json
 import sys
 import logging
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
-import aiosmtplib
+import aiohttp
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("hotradar-email")
 
-# SMTP 配置（内置，skill 可独立运行）
-SMTP_HOST = "smtp.qq.com"
-SMTP_PORT = 465
-SMTP_USER = "1772450647@qq.com"
-SMTP_PASSWORD = "hbukolrtelsmeggg"
-SMTP_SECURE = True
+# Workers API 配置（公开信息，不含任何密码）
+WORKERS_URL = "https://hotradar-email.vercel.app/api/send"
+WORKERS_TOKEN = "hr_email_2026"
 
 IMPORTANCE_EMOJI = {"urgent": "🚨", "high": "🔥", "medium": "⚡", "low": "📌"}
 SOURCE_NAMES = {
@@ -168,10 +163,6 @@ body {{ font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }}
 
 
 async def send_email(config: dict) -> bool:
-    if not all([SMTP_HOST, SMTP_USER, SMTP_PASSWORD]):
-        logger.error("SMTP config incomplete.")
-        return False
-
     to_email = config.get("toEmail", "")
     if not to_email:
         logger.error("No recipient email provided")
@@ -180,36 +171,31 @@ async def send_email(config: dict) -> bool:
     keyword = config.get("keyword", "")
     hotspots = config.get("hotspots", [])
     subject = f"【AI热点监控】您有 {len(hotspots)} 条重要热点待查看 - {keyword}"
-
     html_content = _build_email_html(config)
 
-    message = MIMEMultipart("alternative")
-    message["Subject"] = subject
-    message["From"] = f"HotRadar <{SMTP_USER}>"
-    message["To"] = to_email
-    message.attach(MIMEText(html_content, "html", "utf-8"))
-
     try:
-        if SMTP_SECURE:
-            await aiosmtplib.send(
-                message,
-                hostname=SMTP_HOST,
-                port=SMTP_PORT,
-                username=SMTP_USER,
-                password=SMTP_PASSWORD,
-                use_tls=True,
-            )
-        else:
-            await aiosmtplib.send(
-                message,
-                hostname=SMTP_HOST,
-                port=SMTP_PORT,
-                username=SMTP_USER,
-                password=SMTP_PASSWORD,
-                start_tls=True,
-            )
-        logger.info(f"Email sent to {to_email}")
-        return True
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                WORKERS_URL,
+                json={
+                    "toEmail": to_email,
+                    "subject": subject,
+                    "html": html_content,
+                },
+                headers={
+                    "Authorization": f"Bearer {WORKERS_TOKEN}",
+                    "Content-Type": "application/json",
+                },
+                timeout=aiohttp.ClientTimeout(total=30),
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    logger.info(f"Email sent to {to_email}, id={data.get('id')}")
+                    return True
+                else:
+                    err = await resp.text()
+                    logger.error(f"Email send failed (HTTP {resp.status}): {err}")
+                    return False
     except Exception as e:
         logger.error(f"Email send failed: {e}")
         return False

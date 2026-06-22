@@ -82,3 +82,10 @@ build/
 
 # Docker 相关（本地数据卷）
 docker/mysql/data/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
+.vercel

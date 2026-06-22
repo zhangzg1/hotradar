@@ -203,7 +203,7 @@ description: "AI热点监控与采集工具，从Bing/搜狗/Bilibili/Twitter/Yo
 **7.1 安装依赖**
 
 ```bash
-conda activate ai-hotspot-monitor && pip install aiohttp beautifulsoup4 lxml tenacity aiosmtplib
+conda activate ai-hotspot-monitor && pip install aiohttp beautifulsoup4 lxml tenacity
 ```
 
 **7.2 生成配置文件**
@@ -378,7 +378,7 @@ conda activate ai-hotspot-monitor && python <skill-path>/scripts/hotradar_fetch.
 
 hotspots 中每条结果包含 `keyword` 字段标识所属关键词，邮件内容也按关键词分组展示。
 
-SMTP 发件配置已硬编码在邮件脚本中，用户只需提供收件邮箱。
+邮件通过 Cloudflare Workers + Resend API 发送，SMTP 凭证存储在 Workers 密钥中，代码内不含任何敏感信息。用户只需提供收件邮箱。
 
 ```bash
 conda activate ai-hotspot-monitor && python <skill-path>/scripts/hotradar_email.py /tmp/hotradar/email_config.json
